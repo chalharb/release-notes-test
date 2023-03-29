@@ -1,40 +1,39 @@
-name: CI - Prerelease
+# create a github action that creates a semver tag when pushed to a release branch
+# ex. release/1.1.0 would create a tag 1.1.0-rc.0 and increment each time the branch is updated
+# when pushed to master it would create a tag 1.1.0 and increment each time master is updated
 
+# this is the name of the action
+name: Semver Tag
+
+# this is the event that triggers the action
 on:
   push:
     branches:
       - release/*
+      - master
 
-# env varialble for GITHUB_TOKEN
-env:
-  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-
+# this is the list of jobs that will be run
 jobs:
-  create-tag:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Determine branch version
-        id: determine-version
+      - uses: actions/checkout@v2
+      - name: Get the version
+        id: version
         run: |
-          branch_name=${GITHUB_REF#refs/heads/}
-          version=${branch_name#release/}
-          echo "::set-output name=version::$version"
-        shell: bash
-      - name: Determine last tag
-        id: determine-tag
-        run: |
-          last_tag=$(git describe --abbrev=0 --tags --match 'v*.*.*-*')
-          echo "::set-output name=last_tag::$last_tag"
-        shell: bash
-      - name: Bump version
-        id: bump-version
-        uses: vishnubob/autoincrement-semver@v1
+          VERSION=$(echo ${{ github.ref }} | cut -d / -f 3)
+          echo ::set-output name=version::$VERSION
+      - name: Create Tag
+        id: semver
+        uses: mathieudutour/github-tag-action@v5
         with:
-          bump_level: pre
-          version: ${{ steps.determine-tag.outputs.last_tag }}
-      - name: Create new tag
-        run: |
-          git tag ${{ steps.bump-version.outputs.new_version }}
-          git push --tags
+          # this uses the github ref to determine the version
+          # ex. refs/heads/release/1.1.0 would result in v1.1.0-rc.0
+          # ex. refs/heads/master would result in v1.1.0
+          # tag: ${{ github.ref }}
+          tag: v${{ steps.version.outputs.version }}
+          # this uses the github ref to determine the version
+          # ex. refs/heads/release/1.1.0 would result in 1.1.0-rc.0
+          # ex. refs/heads/master would result in 1.1.0
+          # release_branches: release/*
+          release_branches: refs/heads/release/*
