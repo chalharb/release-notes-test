@@ -12,6 +12,10 @@ on:
       - release/*
       - master
 
+# env variables that can be used in the action
+env:
+  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
 # this is the list of jobs that will be run
 jobs:
   build:
@@ -37,3 +41,4 @@ jobs:
           # ex. refs/heads/master would result in 1.1.0
           # release_branches: release/*
           release_branches: refs/heads/release/*
+          github_token: ${{ secrets.GITHUB_TOKEN }}
