@@ -23,11 +23,18 @@ jobs:
         uses: codfish/semantic-release-action@v2
         with:
           release_branch: ${{ steps.release_branch_semver.outputs.semver }}
-          prerelease: true
+          tag_format: "v${version}"
           branches: |
             [
-              {
-                name: 'pre/rc', 
-                prerelease: '${name.replace(/^release\\//g, "")}'
-              }
+              { 
+                name: "master" 
+              },
+              { 
+                name: "release", channel: "rc", 
+                prerelease: "rc"
+              },
+              { 
+                name: "beta",
+                channel: "beta", prerelease: true
+              },
             ]
