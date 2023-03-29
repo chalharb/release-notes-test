@@ -42,8 +42,7 @@ jobs:
           new_tag="${version_parts[0]}.${version_parts[1]}.$patch"
           echo "::set-output name=new_tag::$new_tag"
         shell: bash
-      - name: Create new tag
+      - uses: actions-ecosystem/action-push-tag@v1
         if: steps.bump-version.outputs.new_tag != null
-        run: |
-          git tag -a v${{ steps.bump-version.outputs.new_tag }} -m "Version ${{ steps.bump-version.outputs.new_tag }}"
-          git push origin v${{ steps.bump-version.outputs.new_tag }}
+        with:
+          tag: ${{ steps.bump-version.outputs.new_tag }}
