@@ -10,32 +10,31 @@ env:
   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
 jobs:
-  build:
+  create-tag:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Determine branch version
+        id: determine-version
+        run: |
+          branch_name=${GITHUB_REF#refs/heads/}
+          version=${branch_name#release/}
+          echo "::set-output name=version::$version"
+        shell: bash
+      - name: Determine last tag
+        id: determine-tag
+        run: |
+          last_tag=$(git describe --abbrev=0 --tags --match 'v*.*.*-*')
+          echo "::set-output name=last_tag::$last_tag"
+        shell: bash
+      - name: Bump version
+        id: bump-version
+        uses: vishnubob/autoincrement-semver@v1
         with:
-          ref: ${{ github.head_ref }} # checkout the correct branch name
-          fetch-depth: 0 # fetch the whole repo history
-
-      # get release branch semver from branch name (e.g. release/1.2.0)
-      - name: Get release branch semver
-        id: release_branch_semver
+          bump_level: pre
+          version: ${{ steps.determine-tag.outputs.last_tag }}
+      - name: Create new tag
         run: |
-          echo "::set-output name=semver::${GITHUB_REF#refs/heads/release/}"
-
-      # create or bump semantic version based on release branch semver (e.g. 1.2.0-rc.0
-      - name: Git Version
-        id: version
-        uses: codacy/git-version@2.7.1
-        with:
-          prefix: v
-          release-branch: release/**
-
-      - name: Use the version
-        run: |
-          echo ${{ steps.version.outputs.version }}
-      - name: Use the previous version
-        run: |
-          echo ${{ steps.version.outputs.previous-version }}
+          git tag ${{ steps.bump-version.outputs.new_version }}
+          git push --tags
