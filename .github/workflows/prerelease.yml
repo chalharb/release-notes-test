@@ -1,0 +1,26 @@
+name: CI - Prerelease
+
+on:
+  push:
+    branches:
+      - release/*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # get release branch semver from branch name (e.g. release/1.2.0)
+      - name: Get release branch semver
+        id: release_branch_semver
+        run: |
+          echo "::set-output name=semver::${GITHUB_REF#refs/heads/release/}"
+
+      # create prerelease semver using codfish/semantic-release-action@v2
+      - name: Create prerelease semver
+        id: prerelease_semver
+        uses: codfish/semantic-release-action@v2
+        with:
+          release_branch: ${{ steps.release_branch_semver.outputs.semver }}
+          prerelease: true
