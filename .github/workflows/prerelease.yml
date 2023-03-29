@@ -31,7 +31,7 @@ jobs:
           # ex. refs/heads/release/1.1.0 would result in v1.1.0-rc.0
           # ex. refs/heads/master would result in v1.1.0
           # tag: ${{ github.ref }}
-          tag: v${{ steps.version.outputs.version }}
+          custom_tag: v${{ steps.version.outputs.version }}
           # this uses the github ref to determine the version
           # ex. refs/heads/release/1.1.0 would result in 1.1.0-rc.0
           # ex. refs/heads/master would result in 1.1.0
