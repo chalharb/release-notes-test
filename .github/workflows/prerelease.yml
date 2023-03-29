@@ -27,7 +27,7 @@ jobs:
           branches: |
             [
               {
-                name: 'release/*',
-                prerelease: true
+                name: 'pre/rc', 
+                prerelease: '${name.replace(/^release\\//g, "")}'
               }
             ]
