@@ -12,10 +12,6 @@ on:
       - release/*
       - master
 
-# env variables that can be used in the action
-env:
-  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-
 # this is the list of jobs that will be run
 jobs:
   build:
@@ -31,14 +27,5 @@ jobs:
         id: semver
         uses: mathieudutour/github-tag-action@v5
         with:
-          # this uses the github ref to determine the version
-          # ex. refs/heads/release/1.1.0 would result in v1.1.0-rc.0
-          # ex. refs/heads/master would result in v1.1.0
-          # tag: ${{ github.ref }}
-          custom_tag: v${{ steps.version.outputs.version }}
-          # this uses the github ref to determine the version
-          # ex. refs/heads/release/1.1.0 would result in 1.1.0-rc.0
-          # ex. refs/heads/master would result in 1.1.0
-          # release_branches: release/*
-          release_branches: refs/heads/release/*
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease_branches: release/*
+          github_token: ${{ secrets.GH_TOKEN }}
