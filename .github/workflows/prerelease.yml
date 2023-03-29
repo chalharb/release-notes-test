@@ -42,7 +42,7 @@ jobs:
           new_tag="${version_parts[0]}.${version_parts[1]}.$patch"
           echo "::set-output name=new_tag::$new_tag"
         shell: bash
-      - uses: actions-ecosystem/action-push-tag@v1
+      - uses: thejeff77/action-push-tag@v1.0.0
         if: steps.bump-version.outputs.new_tag != null
         with:
           tag: ${{ steps.bump-version.outputs.new_tag }}
