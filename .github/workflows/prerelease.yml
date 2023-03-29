@@ -13,7 +13,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }} # checkout the correct branch name
+          fetch-depth: 0 # fetch the whole repo history
 
       # get release branch semver from branch name (e.g. release/1.2.0)
       - name: Get release branch semver
@@ -21,12 +25,14 @@ jobs:
         run: |
           echo "::set-output name=semver::${GITHUB_REF#refs/heads/release/}"
 
-      # create or bump semantic version based on release branch semver (e.g. 1.2.0-rc.0)
-      - name: Create or bump semantic version
-        id: semantic_version
-        uses: mathieudutour/github-tag-action@v5
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          default_bump: prerelease
-          default_preid: rc
-          prerelease_branches: release/*
+      # create or bump semantic version based on release branch semver (e.g. 1.2.0-rc.0
+      - name: Git Version
+        id: version
+        uses: codacy/git-version@2.7.1
+
+      - name: Use the version
+        run: |
+          echo ${{ steps.version.outputs.version }}
+      - name: Use the previous version
+        run: |
+          echo ${{ steps.version.outputs.previous-version }}
