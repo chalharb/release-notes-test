@@ -24,3 +24,10 @@ jobs:
         with:
           release_branch: ${{ steps.release_branch_semver.outputs.semver }}
           prerelease: true
+          branches: |
+            [
+              {
+                name: 'release/*',
+                prerelease: true
+              }
+            ]
