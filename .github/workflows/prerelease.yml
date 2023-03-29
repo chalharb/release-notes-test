@@ -5,6 +5,10 @@ on:
     branches:
       - release/*
 
+# env varialble for GITHUB_TOKEN
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,16 +21,12 @@ jobs:
         run: |
           echo "::set-output name=semver::${GITHUB_REF#refs/heads/release/}"
 
-      # create prerelease semver using codfish/semantic-release-action@v2
-      - name: Create prerelease semver
-        id: prerelease_semver
-        uses: codfish/semantic-release-action@v2
+      # create or bump semantic version based on release branch semver (e.g. 1.2.0-rc.0)
+      - name: Create or bump semantic version
+        id: semantic_version
+        uses: mathieudutour/github-tag-action@v5
         with:
-          release_branch: ${{ steps.release_branch_semver.outputs.semver }}
-          tag_format: "v${version}"
-          branches: |
-            [
-              'main',
-              'release',
-              'beta'
-            ]
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: prerelease
+          default_preid: rc
+          prerelease_branches: release/*
