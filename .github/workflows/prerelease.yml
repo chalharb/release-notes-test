@@ -25,7 +25,7 @@ jobs:
       - name: Get the version
         id: version
         run: |
-          VERSION=$(echo ${{ github.ref }} | cut -d / -f 3)
+          VERSION=$(echo ${{ github.ref }} | cut -d / -f 4)
           echo ::set-output name=version::$VERSION
       - name: Create Tag
         id: semver
